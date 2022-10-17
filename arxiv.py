@@ -19,6 +19,7 @@ home = os.path.expanduser('~')
 outpath = home + "/Desktop/arXivPDF/"
 if not os.path.exists(outpath):
     os.mkdir(outpath)
+webpath = "https://arxiv.org"
 driver.get("https://arxiv.org/list/astro-ph.GA/recent")
 content = driver.page_source
 soup = BeautifulSoup(content)
