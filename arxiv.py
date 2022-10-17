@@ -11,27 +11,27 @@ options = Options()
 options.add_argument("--headless")
 driver = webdriver.Chrome("/usr/local/chromedriver", options=options)
 
+# extracted information
 title = []
 _url = []
 author_list = []
 abstract = []
-home = os.path.expanduser('~')
-outpath = home + "/Desktop/arXivPDF/"
+home = os.path.expanduser('~') # read the path of HOME directory
+outpath = home + "/Desktop/arXivPDF/" # output directory. Default: create a new directory at /Desktop
 if not os.path.exists(outpath):
     os.mkdir(outpath)
 webpath = "https://arxiv.org"
-driver.get("https://arxiv.org/list/astro-ph.GA/recent")
-content = driver.page_source
+driver.get("https://arxiv.org/list/astro-ph.GA/recent") # use Google Chrome to open this web
+content = driver.page_source # read source code
 soup = BeautifulSoup(content)
-#driver.close()
-#print(soup)
 for a in soup.find_all("a", title="Abstract"):
-    abslink = str(webpath + a['href'])
+    abslink = str(webpath + a['href']) # link to the abstract page of a paper
+    ## redirect website to the abstract page of a paper
     driver.get(abslink)
     _ = driver.page_source
     _soup = BeautifulSoup(_)
     author_count = 0 # list up to 5 authors
-    #print(abslink)
+    ## collect information of all new papers
     _url.append(abslink)
     for b in _soup.find_all("meta", attrs={"name":"citation_title"}):
         title.append(str(b["content"]))
@@ -59,8 +59,7 @@ pdf.add_page()
 # that you want in the pdf
 pdf.add_font("Arial", "", "arial/arial.ttf", uni=True)
 pdf.set_font("Arial", size = 14)
-
-# create a cell
+#construct a document
 for a in range(len(_url)):
     pdf.cell(190, 10, txt = ('[%s]  ' % str(a) + str(_url[a])), link=_url[a], ln=1)
     pdf.set_font("Arial", style="B", size = 14)
