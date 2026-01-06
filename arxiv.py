@@ -5,6 +5,7 @@ from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.by import By
 from bs4 import BeautifulSoup
 from fpdf import FPDF
+from pylatexenc.latex2text import LatexNodes2Text
 import datetime
 from PIL import Image
 
@@ -39,8 +40,8 @@ for ind, a in enumerate(soup.find_all("a", title="Abstract")):
     # Set the window size to match the entire webpage
     driver.set_window_size(width, height)
 
-    screensh = driver.find_element(By.TAG_NAME, 'blockquote')
-    screensh.screenshot((outpath+"screenshot_ab%d.png" %ind))
+    #screensh = driver.find_element(By.TAG_NAME, 'blockquote')
+    #screensh.screenshot((outpath+"screenshot_ab%d.png" %ind))
     
     _ = driver.page_source
     _soup = BeautifulSoup(_)
@@ -49,15 +50,15 @@ for ind, a in enumerate(soup.find_all("a", title="Abstract")):
     _url.append(abslink)
     for b in _soup.find_all("meta", attrs={"name":"citation_title"}):
         title.append(str(b["content"]))
-    '''
+    yy = 0
     for b in _soup.find_all("meta", attrs={"name":"citation_abstract"}):
-        print(b)
         abs = ""
         for word in b["content"].split():
             abs += word + ' '
         abs = abs[:-1]
-        abstract.append(abs)
-    '''
+        abs_text = LatexNodes2Text().latex_to_text(abs)
+        abstract.append(abs_text)    
+
     for b in _soup.find_all("meta", attrs={"name":"citation_author"}):
         if author_count < 5:
             if author_count == 0:
@@ -86,15 +87,15 @@ for a in range(len(_url)):
     pdf.set_font("Arial", style="U", size = 14)
     pdf.write(5, txt = (author_list[a]))
     pdf.ln(7)
-    pdf.image((outpath+"screenshot_ab%d.png" %a))
-    os.remove((outpath+"screenshot_ab%d.png" %a))
-    #pdf.set_font("Arial", style="B", size = 14)
-    #pdf.write(6, txt = "Abstract = ")
-    #pdf.ln(7)
-    #pdf.set_font("Arial", size = 14)
-    #pdf.write(6, txt = abstract[a])#, align='C')
-    #pdf.multi_cell(190, 5, txt = abstract[a], align='J')
-    #pdf.ln(15)
+    #pdf.image((outpath+"screenshot_ab%d.png" %a), w=200)
+    #os.remove((outpath+"screenshot_ab%d.png" %a))
+    pdf.set_font("Arial", style="B", size = 14)
+    pdf.write(6, txt = "Abstract = ")
+    pdf.ln(7)
+    pdf.set_font("Arial", size = 14)
+    #pdf.write(6, txt = abstract[a]) #, align='J')
+    pdf.multi_cell(190, 5, txt = abstract[a], align='J')
+    pdf.ln(15)
     if a < (len(_url)-1):
         pdf.add_page()
 pdf.output(outpath + "arXiv_" + date + ".pdf")
