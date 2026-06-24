@@ -8,7 +8,7 @@ $...$ fragment with matplotlib and embedding it inline at the correct baseline.
 Setup (Python 3.8 friendly):
     pip install "arxiv==2.3.2" reportlab pylatexenc matplotlib
 
-Tune everything in the CONFIG block below.
+Tune the setup in the CONFIG block below.
 """
 
 import os
